@@ -11,6 +11,7 @@ def new_game():
     i=0 #counter for players steps
     win = False #someone wins || end the game
     new_pos=0
+    exit=False #user press 'H' to finish the game
     
     clear_output()
     print('\n Welcome in the game TicToc!')
@@ -24,11 +25,13 @@ def new_game():
         xoro='x'
     elif xoro=='o' or xoro=='O' or xoro=='0':
         xoro='o'
+    elif xoro=='H' or xoro=='h':
+        exit=True
     else:
         xoro='x'
         print('Your default icon is "X" \n')
     
-    return fill_the_table,keys,win_trio,i,win,new_pos,xoro
+    return fill_the_table,keys,win_trio,i,win,new_pos,xoro,exit
 
 
 #function for printing the table after each iteration
@@ -41,28 +44,30 @@ def print_the_table (fill_the_table):
     
 
 #add the new position   
-def step(fill_the_table,xoro,keys):
+def step(fill_the_table,xoro,keys,new_pos,exit):
     inp=input('Choose the new position for your icon: ')#new position
-    
-    #inp is not a number
+            
     '''try:
         new_pos=int(inp) #integer position
     except ValueError:
         print('Please type the correct position')
         step(fill_the_table,xoro,keys)
-    else:'''
-    if inp.lower() not in keys:
-        print('Please type the correct position')
-        step(fill_the_table,xoro,keys)
+    else:'''    
+    
+    if inp=='H' or inp=='h':
+        exit=True
+    elif inp.lower() not in keys:
+        print('Please type the correct position') #not a number
+        step(fill_the_table,xoro,keys,new_pos,exit)
     else:
         new_pos=int(inp)
         if fill_the_table[new_pos-1]!=' ':
             print('Current position is already booked ;) Please choose the empty one')
-            step(fill_the_table,xoro,keys)
+            step(fill_the_table,xoro,keys,exit)
         else:
             fill_the_table[new_pos-1]=xoro 
-            keys[new_pos-1]=xoro #tabke with empty and booked coordinates
-    return fill_the_table,keys,new_pos
+            keys[new_pos-1]=xoro #table with empty and booked coordinates
+    return fill_the_table,keys,new_pos,exit
     
 
 #print what player should be next
@@ -85,21 +90,25 @@ def check_the_winner(i,xoro,win_trio,new_pos,fill_the_table,win):
         if i in range(4,8):
             if win_trio[n1][0]==win_trio[n1][1]==win_trio[n1][2]==xoro:
                 win=True
-                print("\n CONGRATS! PLAYER {} IS THE WINNER! \n".format(xoro))
+                #fill_the_table[(win_trio[n1][0])-1].upper()
+                #fill_the_table[(win_trio[n1][1])-1].upper()
+                #fill_the_table[(win_trio[n1][2])-1].upper()
+                print("\n CONGRATS! PLAYER {} WINS! \n".format(xoro.upper()))
                 print_the_table(fill_the_table)
                 break
     return win
+
 
 
 '''
 START!
 
 '''
-fill_the_table,keys,win_trio,i,win,new_pos,xoro=new_game()
+fill_the_table,keys,win_trio,i,win,new_pos,xoro,exit=new_game()
 
    
 #the game is going on until any player print 'H'
-while input !='H':
+while exit==False:
     if i<=8:
         
         if i!=0:
@@ -107,7 +116,7 @@ while input !='H':
         text(i)#what player should go
         print_the_table(keys) #positions numbers
         print_the_table(fill_the_table) #empty booked positions
-        fill_the_table,keys,new_pos=step(fill_the_table,xoro,keys) #choose the new position
+        fill_the_table,keys,new_pos,exit=step(fill_the_table,xoro,keys,new_pos,exit) #choose the new position
         win=check_the_winner(i,xoro,win_trio,new_pos,fill_the_table,win) #do we have the winner
         print('\n')
         
@@ -131,16 +140,15 @@ while input !='H':
         
     if win==True:
         repeat=input('Do you want to play again? Y/N: ')
-        if repeat=='Y' or repeat=='y':
-            fill_the_table,keys,win_trio,i,win,new_pos,xoro=new_game()
-            
-            
+        if repeat=='N' or repeat=='n' or repeat=='H' or repeat=='h':
+            exit=True
         else:
-            print('See you soon')
-            break
-
+            fill_the_table,keys,win_trio,i,win,new_pos,xoro,exit=new_game()      
+    
+    if exit==True:
+        print('See you soon')
+        break 
 
 pass
 
 print('Bye! =)')
-    
